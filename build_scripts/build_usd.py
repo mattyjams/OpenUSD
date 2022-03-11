@@ -1266,6 +1266,18 @@ def InstallPNG(context, force, buildArgs):
 PNG = Dependency("PNG", InstallPNG, "include/png.h")
 
 ############################################################
+# Imath
+
+IMATH_URL = "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.1.12.zip"
+
+def InstallImath(context, force, buildArgs):
+    with CurrentWorkingDirectory(DownloadURL(IMATH_URL, context, force)):
+        RunCMake(context, force,
+                 ['-DBUILD_TESTING=OFF'] + buildArgs)
+
+IMATH = Dependency("Imath", InstallImath, "include/Imath/ImathNamespace.h")
+
+############################################################
 # IlmBase/OpenEXR
 
 OPENEXR_URL = "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.1.11.zip"
