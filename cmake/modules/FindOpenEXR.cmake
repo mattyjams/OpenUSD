@@ -6,7 +6,7 @@
 #
 
 find_path(OPENEXR_INCLUDE_DIR
-    OpenEXR/half.h
+    OpenEXR/ImfVersion.h
 HINTS
     "${OPENEXR_LOCATION}"
     "$ENV{OPENEXR_LOCATION}"
@@ -40,13 +40,11 @@ if(OPENEXR_INCLUDE_DIR)
 endif()
 
 foreach(OPENEXR_LIB
-    Half
     Iex
-    Imath
-    IlmImf
     IlmThread
-    IlmImfUtil
-    IexMath
+    OpenEXR
+    OpenEXRCore
+    OpenEXRUtil
     )
 
     # OpenEXR libraries may be suffixed with the version number, so we search
