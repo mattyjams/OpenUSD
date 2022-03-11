@@ -2491,7 +2491,7 @@ if context.buildImaging:
     requiredDependencies += [OPENSUBDIV]
 
     if context.enableOpenVDB:
-        requiredDependencies += [BLOSC, BOOST, OPENEXR, OPENVDB, TBB]
+        requiredDependencies += [BLOSC, BOOST, IMATH, OPENEXR, OPENVDB, TBB]
     
     if context.buildOIIO:
         requiredDependencies += [BOOST, JPEG, TIFF, PNG, OPENEXR, OPENIMAGEIO]
