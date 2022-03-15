@@ -910,7 +910,7 @@ def InstallBoost_Helper(context, force, buildArgs):
                 b2_settings.append("python-debugging=on")
 
         if context.buildOIIO:
-            b2_settings.append("--with-date_time")
+            b2_settings.append("--with-chrono")
 
         if context.buildOIIO or context.enableOpenVDB:
             b2_settings.append("--with-system")
