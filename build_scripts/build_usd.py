@@ -527,7 +527,7 @@ def DownloadFileWithUrllib(url, outputFilename):
         outfile.write(r.read())
 
 def DownloadURL(url, context, force, extractDir = None, 
-        dontExtract = None):
+        dontExtract = None, filenamePrefix = ""):
     """Download and extract the archive file at given URL to the
     source directory specified in the context. 
 
@@ -537,8 +537,11 @@ def DownloadURL(url, context, force, extractDir = None,
     Returns the absolute path to the directory where files have 
     been extracted."""
     with CurrentWorkingDirectory(context.srcDir):
-        # Extract filename from URL and see if file already exists. 
-        filename = url.split("/")[-1]       
+        # Extract filename from URL and see if file already exists.
+        filename = os.path.basename(url)
+        if filenamePrefix:
+            filename = "%s_%s" % (filenamePrefix, filename)
+
         if force and os.path.exists(filename):
             os.remove(filename)
 
@@ -1271,7 +1274,7 @@ PNG = Dependency("PNG", InstallPNG, "include/png.h")
 IMATH_URL = "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.1.12.zip"
 
 def InstallImath(context, force, buildArgs):
-    with CurrentWorkingDirectory(DownloadURL(IMATH_URL, context, force)):
+    with CurrentWorkingDirectory(DownloadURL(IMATH_URL, context, force, filenamePrefix="Imath")):
         RunCMake(context, force,
                  ['-DBUILD_TESTING=OFF'] + buildArgs)
 
@@ -1283,7 +1286,7 @@ IMATH = Dependency("Imath", InstallImath, "include/Imath/ImathNamespace.h")
 OPENEXR_URL = "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.1.11.zip"
 
 def InstallOpenEXR(context, force, buildArgs):
-    with CurrentWorkingDirectory(DownloadURL(OPENEXR_URL, context, force)):
+    with CurrentWorkingDirectory(DownloadURL(OPENEXR_URL, context, force, filenamePrefix="OpenEXR")):
         RunCMake(context, force, 
                  ['-DOPENEXR_INSTALL_TOOLS=OFF',
                   '-DOPENEXR_INSTALL_EXAMPLES=OFF',
