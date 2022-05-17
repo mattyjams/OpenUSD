@@ -1340,18 +1340,24 @@ PTEX = Dependency("Ptex", InstallPtex, "include/PtexVersion.h")
 ############################################################
 # BLOSC (Compression used by OpenVDB)
 
-# Using blosc v1.20.1 to avoid build errors on macOS Catalina (10.15)
-# related to implicit declaration of functions in zlib. See:
-# https://github.com/Blosc/python-blosc/issues/229
-BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/v1.20.1.zip"
+BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/refs/tags/v1.21.6.zip"
 
 def InstallBLOSC(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(BLOSC_URL, context, force)):
-        macArgs = []
+        extraArgs = [
+            '-DBUILD_TESTS=OFF',
+            '-DBUILD_FUZZERS=OFF',
+            '-DBUILD_BENCHMARKS=OFF'
+        ]
+
         if MacOS() and apple_utils.IsTargetArm(context):
             # Need to disable SSE for macOS ARM targets.
-            macArgs = ["-DDEACTIVATE_SSE2=ON"]
-        RunCMake(context, force, buildArgs + macArgs)
+            extraArgs += ["-DDEACTIVATE_SSE2=ON"]
+
+        # Add on any user-specified extra arguments.
+        extraArgs += buildArgs
+
+        RunCMake(context, force, extraArgs)
 
 BLOSC = Dependency("Blosc", InstallBLOSC, "include/blosc.h")
 
