@@ -1281,15 +1281,16 @@ def InstallImath(context, force, buildArgs):
 IMATH = Dependency("Imath", InstallImath, "include/Imath/ImathNamespace.h")
 
 ############################################################
-# IlmBase/OpenEXR
+# OpenEXR
 
-OPENEXR_URL = "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.1.11.zip"
+OPENEXR_URL = "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.3.1.zip"
 
 def InstallOpenEXR(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OPENEXR_URL, context, force, filenamePrefix="OpenEXR")):
         RunCMake(context, force, 
-                 ['-DOPENEXR_INSTALL_TOOLS=OFF',
-                  '-DOPENEXR_INSTALL_EXAMPLES=OFF',
+                 ['-DOPENEXR_BUILD_TOOLS=OFF',
+                  '-DOPENEXR_BUILD_EXAMPLES=OFF',
+                  '-DOPENEXR_INSTALL_PKG_CONFIG=OFF',
                   '-DBUILD_TESTING=OFF'] + buildArgs)
 
 OPENEXR = Dependency("OpenEXR", InstallOpenEXR, "include/OpenEXR/ImfVersion.h")
