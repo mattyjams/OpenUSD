@@ -1364,7 +1364,8 @@ BLOSC = Dependency("Blosc", InstallBLOSC, "include/blosc.h")
 ############################################################
 # OpenVDB
 
-OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v9.1.0.zip"
+# Note that OpenVDB 10.X+ requires TBB 2020.2 or later.
+OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v11.0.0.zip"
 
 # OpenVDB v9.1.0 requires TBB 2019.0 or above, but this script installs
 # TBB 2018 on macOS Intel systems for reasons documented above. So we
@@ -1379,9 +1380,8 @@ def InstallOpenVDB(context, force, buildArgs):
 
     with CurrentWorkingDirectory(DownloadURL(openvdb_url, context, force)):
         extraArgs = [
-            '-DOPENVDB_BUILD_PYTHON_MODULE=OFF',
             '-DOPENVDB_BUILD_BINARIES=OFF',
-            '-DOPENVDB_BUILD_UNITTESTS=OFF'
+            '-DUSE_IMATH_HALF=ON'
         ]
 
         # Make sure to use boost installed by the build script and not any
@@ -1393,9 +1393,6 @@ def InstallOpenVDB(context, force, buildArgs):
         extraArgs.append('-DBLOSC_ROOT="{instDir}"'
                          .format(instDir=context.instDir))
         extraArgs.append('-DTBB_ROOT="{instDir}"'
-                         .format(instDir=context.instDir))
-        # OpenVDB needs Half type from IlmBase
-        extraArgs.append('-DILMBASE_ROOT="{instDir}"'
                          .format(instDir=context.instDir))
 
         # Add on any user-specified extra arguments.
