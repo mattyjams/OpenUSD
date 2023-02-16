@@ -1215,7 +1215,7 @@ TIFF = Dependency("TIFF", InstallTIFF, "include/tiff.h")
 ############################################################
 # PNG
 
-PNG_URL = "https://github.com/glennrp/libpng/archive/refs/tags/v1.6.38.zip"
+PNG_URL = "https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.44.zip"
 
 def InstallPNG(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(PNG_URL, context, force)):
@@ -1224,11 +1224,6 @@ def InstallPNG(context, force, buildArgs):
             # Ensure libpng's build doesn't erroneously activate inappropriate
             # Neon extensions
             macArgs = ["-DCMAKE_C_FLAGS=\"-DPNG_ARM_NEON_OPT=0\""]
-
-            if context.targetUniversal:
-                PatchFile("scripts/genout.cmake.in",
-                [("CMAKE_OSX_ARCHITECTURES",
-                  "CMAKE_OSX_INTERNAL_ARCHITECTURES")])
 
         RunCMake(context, force, buildArgs + macArgs)
 
