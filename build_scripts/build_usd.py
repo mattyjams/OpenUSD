@@ -1183,32 +1183,23 @@ JPEG = Dependency("JPEG", InstallJPEG, "include/jpeglib.h")
 ############################################################
 # TIFF
 
-TIFF_URL = "https://gitlab.com/libtiff/libtiff/-/archive/v4.0.7/libtiff-v4.0.7.zip"
+TIFF_URL = "https://gitlab.com/libtiff/libtiff/-/archive/v4.7.0/libtiff-v4.7.0.zip"
 
 def InstallTIFF(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(TIFF_URL, context, force)):
-        # libTIFF has a build issue on Windows where tools/tiffgt.c
-        # unconditionally includes unistd.h, which does not exist.
-        # To avoid this, we patch the CMakeLists.txt to skip building
-        # the tools entirely. We do this on Linux and MacOS as well
-        # to avoid requiring some GL and X dependencies.
-        #
-        # We also need to skip building tests, since they rely on 
-        # the tools we've just elided.
-        PatchFile("CMakeLists.txt", 
-                   [("add_subdirectory(tools)", "# add_subdirectory(tools)"),
-                    ("add_subdirectory(test)", "# add_subdirectory(test)")])
+        extraArgs = [
+            '-Dtiff-tools=OFF',
+            '-Dtiff-tests=OFF'
+        ]
 
         # The libTIFF CMakeScript says the ld-version-script 
         # functionality is only for compilers using GNU ld on 
         # ELF systems or systems which provide an emulation; therefore
         # skipping it completely on mac and windows.
         if MacOS() or Windows():
-            extraArgs = ["-Dld-version-script=OFF"]
-        else:
-            extraArgs = []
-        extraArgs += buildArgs
-        RunCMake(context, force, extraArgs)
+            extraArgs += ["-Dld-version-script=OFF"]
+
+        RunCMake(context, force, extraArgs + buildArgs)
 
 TIFF = Dependency("TIFF", InstallTIFF, "include/tiff.h")
 
