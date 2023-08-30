@@ -1379,6 +1379,25 @@ def InstallOpenVDB(context, force, buildArgs):
         openvdb_url = OPENVDB_INTEL_URL
 
     with CurrentWorkingDirectory(DownloadURL(openvdb_url, context, force)):
+        # Replace all usages of COMPILE_LANG_AND_ID in add_link_options() calls
+        # with LINK_LANG_AND_ID instead.
+        PatchFile(
+            "cmake/config/OpenVDBCXX.cmake",
+            [('add_link_options("$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:Debug>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:COVERAGE>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:COVERAGE>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:TSAN>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:TSAN>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:ASAN>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:ASAN>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:LSAN>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:LSAN>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:MSAN>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:MSAN>,$<LINK_LANG_AND_ID:CXX,'),
+             ('add_link_options("$<$<AND:$<CONFIG:UBSAN>,$<COMPILE_LANG_AND_ID:CXX,',
+              'add_link_options("$<$<AND:$<CONFIG:UBSAN>,$<LINK_LANG_AND_ID:CXX,')])
+
         extraArgs = [
             '-DOPENVDB_BUILD_BINARIES=OFF',
             '-DUSE_IMATH_HALF=ON'
