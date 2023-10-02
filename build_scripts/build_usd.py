@@ -1022,11 +1022,10 @@ elif MacOS():
     # On MacOS Intel systems we experience various crashes in tests during
     # teardown starting with 2018 Update 2. Until we figure that out, we use
     # 2018 Update 1 on this platform.
-    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.zip"
+    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.3.zip"
     TBB_INTEL_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/2018_U1.zip"
 else:
-    # Use point release with fix https://github.com/oneapi-src/oneTBB/pull/833
-    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.1.zip"
+    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.3.zip"
 
 def InstallTBB(context, force, buildArgs):
     if Windows():
