@@ -1415,7 +1415,8 @@ def InstallOpenImageIO(context, force, buildArgs):
                      '-DOIIO_BUILD_TESTS=OFF',
                      '-DBUILD_DOCS=OFF',
                      '-DUSE_PYTHON=OFF',
-                     '-DSTOP_ON_WARNING=OFF']
+                     '-DSTOP_ON_WARNING=OFF',
+                     '-DCMAKE_CXX_STANDARD=17']
 
         # OIIO's FindOpenEXR module circumvents CMake's normal library 
         # search order, which causes versions of OpenEXR installed in
