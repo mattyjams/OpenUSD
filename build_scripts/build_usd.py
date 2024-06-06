@@ -728,7 +728,8 @@ BOOST_VERSION_FILES = [
     "include/boost/version.hpp",
     "include/boost-1_76/boost/version.hpp",
     "include/boost-1_78/boost/version.hpp",
-    "include/boost-1_82/boost/version.hpp"
+    "include/boost-1_82/boost/version.hpp",
+    "include/boost-1_85/boost/version.hpp"
 ]
 
 def InstallBoost_Helper(context, force, buildArgs):
@@ -782,7 +783,7 @@ def InstallBoost_Helper(context, force, buildArgs):
     pyInfo = GetPythonInfo(context)
     pyVer = (int(pyInfo[3].split('.')[0]), int(pyInfo[3].split('.')[1]))
     if MacOS() or (context.buildBoostPython and pyVer >= (3,11)):
-        BOOST_URL = "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.zip"
+        BOOST_URL = "https://boostorg.jfrog.io/artifactory/main/release/1.85.0/source/boost_1_85_0.zip"
     elif context.buildBoostPython and pyVer >= (3, 10):
         BOOST_URL = "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.zip"
     elif IsVisualStudio2022OrGreater():
@@ -1338,6 +1339,7 @@ def InstallOpenVDB(context, force, buildArgs):
         # system installed boost
         extraArgs.append('-DBoost_NO_BOOST_CMAKE=On')
         extraArgs.append('-DBoost_NO_SYSTEM_PATHS=True')
+        extraArgs.append('-DBoost_ADDITIONAL_VERSIONS=1.85')
 
         extraArgs.append('-DBLOSC_ROOT="{instDir}"'
                          .format(instDir=context.instDir))
@@ -1392,6 +1394,7 @@ def InstallOpenImageIO(context, force, buildArgs):
         # system installed boost
         extraArgs.append('-DBoost_NO_BOOST_CMAKE=On')
         extraArgs.append('-DBoost_NO_SYSTEM_PATHS=True')
+        extraArgs.append('-DBoost_ADDITIONAL_VERSIONS=1.85')
 
         # OpenImageIO 2.3.5 changed the default postfix for debug library
         # names from "" to "_d". USD's build system currently does not support
@@ -1854,6 +1857,7 @@ def InstallUSD(context, force, buildArgs):
         # system installed boost
         extraArgs.append('-DBoost_NO_BOOST_CMAKE=On')
         extraArgs.append('-DBoost_NO_SYSTEM_PATHS=True')
+        extraArgs.append('-DBoost_ADDITIONAL_VERSIONS=1.85')
         extraArgs += buildArgs
 
         RunCMake(context, force, extraArgs)
