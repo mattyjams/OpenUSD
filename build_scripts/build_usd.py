@@ -1319,8 +1319,8 @@ OPENEXR = Dependency("OpenEXR", InstallOpenEXR, "include/OpenEXR/ImfVersion.h")
 ############################################################
 # Ptex
 
-PTEX_URL = "https://github.com/wdas/ptex/archive/refs/tags/v2.4.2.zip"
-PTEX_VERSION = "v2.4.2"
+PTEX_URL = "https://github.com/wdas/ptex/archive/refs/tags/v2.4.3.zip"
+PTEX_VERSION = "v2.4.3"
 
 def InstallPtex(context, force, buildArgs):
     cmakeOptions = [
