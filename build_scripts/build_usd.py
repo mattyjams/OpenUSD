@@ -805,6 +805,19 @@ def InstallBoost_Helper(context, force, buildArgs):
 
     with CurrentWorkingDirectory(DownloadURL(BOOST_URL, context, force, 
                                              dontExtract=dontExtract)):
+        # Patch the Boost source in case we're building for NumPy 2.X+.
+        # This is the change in commit 0474de0 mentioned in the notes above.
+        PatchFile(
+            "libs/python/src/numpy/dtype.cpp",
+            [('int dtype::get_itemsize() const { return reinterpret_cast<PyArray_Descr*>(ptr())->elsize;}',
+'''int dtype::get_itemsize() const {
+#if NPY_ABI_VERSION < 0x02000000
+  return reinterpret_cast<PyArray_Descr*>(ptr())->elsize;
+#else
+  return PyDataType_ELSIZE(reinterpret_cast<PyArray_Descr*>(ptr()));
+#endif
+}''')])
+
         if Windows():
             bootstrap = "bootstrap.bat"
         else:
