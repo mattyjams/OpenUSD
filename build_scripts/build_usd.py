@@ -1711,8 +1711,8 @@ EMBREE = Dependency("Embree", InstallEmbree,
 # AnimX
 
 # This GitHub project has no releases, so we fixed on the latest commit as of
-# 2024-02-06 - 5db8ee4, which was committed on 2018-11-05
-ANIMX_URL = "https://github.com/Autodesk/animx/archive/5db8ee416d5fa7050357f498d4dcfaa6ff3f7738.zip"
+# 2024-09-17 - 11c31ac, which was committed on 2024-06-12
+ANIMX_URL = "https://github.com/Autodesk/animx/archive/11c31ac74e526b599031414866db639383c9a5e0.zip"
 
 def InstallAnimX(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(ANIMX_URL, context, force)):
