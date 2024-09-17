@@ -1149,7 +1149,30 @@ JPEG_URL = "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/3.0
 def InstallJPEG(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(JPEG_URL, context, force)):
         extraJPEGArgs = buildArgs
-        if not which("nasm"):
+        if MacOSTargetUniversal(context):
+            # XXX: libjpeg-turbo uses assembly code when SIMD extensions are
+            # enabled, in which case it does not support building universal
+            # binaries for macOS in a single invocation of CMake.
+            # For convenience when building universal binaries for OpenUSD,
+            # we disable SIMD extensions and patch the CMake setup to allow
+            # the build to proceed, even though we may be sacrificing
+            # performance.
+            PatchFile(
+                "CMakeLists.txt",
+                [('    message(FATAL_ERROR "libjpeg-turbo contains assembly code, so it cannot be built with multiple values in CMAKE_OSX_ARCHITECTURES.")',
+'''    if (WITH_SIMD)
+      message(FATAL_ERROR "libjpeg-turbo contains assembly code, so it cannot be built with multiple values in CMAKE_OSX_ARCHITECTURES.")
+    endif()'''),
+                 ('if(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" OR',
+'''if(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64;arm64" OR
+  CMAKE_OSX_ARCHITECTURES MATCHES "arm64;x86_64")
+  set(CPU_TYPE universal)
+elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" OR''')])
+
+            extraJPEGArgs.append("-DWITH_SIMD=FALSE")
+            extraJPEGArgs.append("-DFLOATTEST8=no-fp-contract")
+            extraJPEGArgs.append("-DFLOATTEST12=no-fp-contract")
+        elif not which("nasm"):
             extraJPEGArgs.append("-DWITH_SIMD=FALSE")
 
         RunCMake(context, force, extraJPEGArgs)
