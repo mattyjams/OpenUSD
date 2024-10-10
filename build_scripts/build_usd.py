@@ -1287,6 +1287,27 @@ OPENEXR_URL = "https://github.com/AcademySoftwareFoundation/openexr/archive/refs
 
 def InstallOpenEXR(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OPENEXR_URL, context, force, filenamePrefix="OpenEXR")):
+        # In OpenEXR v3.3.1, a change was made in the CMake setup to switch
+        # from using FetchContent_Populate() to FetchContent_MakeAvailable()
+        # to bring in libdeflate (and Imath) as dependencies:
+        # https://github.com/AcademySoftwareFoundation/openexr/commit/af9ef0e68f6493dc2053c0489f558955e948c9d9
+        #
+        # This appears to have the side effect that libdeflate is now being
+        # included as part of the build, causing libraries and headers to be
+        # built and installed. This can create an issue for libraries that are
+        # built after OpenEXR (such as libtiff) that unexpectedly find this
+        # build of libdeflate and try to link against it.
+        # It seems that the intent was to bring in the libdeflate source solely
+        # to copy select files into OpenEXRCore, in which case the
+        # EXCLUDE_FROM_ALL option should prevent libdeflate from being included
+        # in the build. This patches the OpenEXRSetup.cmake to make use of that
+        # option before calling FetchContent_MakeAvailable().
+        PatchFile(
+            "cmake/OpenEXRSetup.cmake",
+            [('  FetchContent_Declare(Deflate',
+'''  FetchContent_Declare(Deflate
+    EXCLUDE_FROM_ALL''')])
+
         RunCMake(context, force, 
                  ['-DOPENEXR_BUILD_TOOLS=OFF',
                   '-DOPENEXR_BUILD_EXAMPLES=OFF',
