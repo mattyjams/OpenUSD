@@ -55,6 +55,7 @@ TF_DEFINE_PRIVATE_TOKENS(
         (RegisteredVariantSets)
             (selectionExportPolicy)
 
+    ((DefaultGeometryScopeName, "Geom"))
     ((DefaultMaterialsScopeName, "Looks"))
     ((DefaultPrimaryCameraName, "main_cam"))
 
