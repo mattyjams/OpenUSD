@@ -817,7 +817,13 @@ BOOST_VERSION_FILES = [
     "include/boost/version.hpp",
     "include/boost-1_80/boost/version.hpp",
     "include/boost-1_82/boost/version.hpp",
-    "include/boost-1_86/boost/version.hpp"
+    "include/boost-1_86/boost/version.hpp",
+    "include/boost-1_87/boost/version.hpp",
+    "include/boost-1_88/boost/version.hpp",
+    "include/boost-1_89/boost/version.hpp",
+    "include/boost-1_90/boost/version.hpp",
+    "include/boost-1_91/boost/version.hpp",
+    "include/boost-1_92/boost/version.hpp"
 ]
 
 def InstallBoost_Helper(context, force, buildArgs):
@@ -874,14 +880,14 @@ def InstallBoost_Helper(context, force, buildArgs):
     # - Building on MacOS requires v1.82.0 or later for C++17 support starting
     #   with Xcode 15.
     if IsVisualStudio2026OrGreater():
-        BOOST_VERSION = (1, 90, 0)
-        BOOST_SHA256 = "bdc79f179d1a4a60c10fe764172946d0eeafad65e576a8703c4d89d49949973c"
+        BOOST_VERSION = (1, 92, 0)
+        BOOST_SHA256 = "c46baee75ed4b558cf6553630d0615a147ed582812917b57e6f0839d1954549f"
     if IsVisualStudio2022OrGreater():
-        BOOST_VERSION = (1, 86, 0)
-        BOOST_SHA256 = "cd20a5694e753683e1dc2ee10e2d1bb11704e65893ebcc6ced234ba68e5d8646"
+        BOOST_VERSION = (1, 92, 0)
+        BOOST_SHA256 = "c46baee75ed4b558cf6553630d0615a147ed582812917b57e6f0839d1954549f"
     elif MacOS():
-        BOOST_VERSION = (1, 82, 0)
-        BOOST_SHA256 = "f7c9e28d242abcd7a2c1b962039fcdd463ca149d1883c3a950bbcc0ce6f7c6d9"
+        BOOST_VERSION = (1, 92, 0)
+        BOOST_SHA256 = "c46baee75ed4b558cf6553630d0615a147ed582812917b57e6f0839d1954549f"
     else:
         BOOST_VERSION = (1, 80, 0)
         BOOST_SHA256 = "e34756f63abe8ac34b35352743f17d061fcc825969a2dd8458264edb38781782"
