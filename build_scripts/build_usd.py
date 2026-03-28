@@ -1864,7 +1864,7 @@ MATERIALX = Dependency("MaterialX", InstallMaterialX, "include/MaterialXCore/Lib
 # Embree
 
 def InstallEmbree(context, force, buildArgs):
-    EMBREE_URL = "https://github.com/RenderKit/embree/archive/refs/tags/v4.3.3.zip"
+    EMBREE_URL = "https://github.com/RenderKit/embree/archive/refs/tags/v4.4.1.zip"
 
     with CurrentWorkingDirectory(DownloadURL(EMBREE_URL, context, force)):
         extraArgs = [
