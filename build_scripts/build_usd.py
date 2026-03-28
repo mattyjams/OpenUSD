@@ -1488,6 +1488,20 @@ BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/refs/tags/v1.21.6.zip"
 
 def InstallBLOSC(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(BLOSC_URL, context, force)):
+        # CMake 4.0.0 dropped support for CMake versions earlier than 3.5.
+        # This has been fixed but not yet released for c-blosc:
+        #     https://github.com/Blosc/c-blosc/commit/051b9d2
+        PatchFile(
+            "CMakeLists.txt",
+            [(
+'''cmake_minimum_required(VERSION 2.8.12)
+if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+    cmake_policy(SET CMP0063 NEW)
+endif()''',
+'''# Recent versions of cmake dropped compatibility with < 3.5
+cmake_minimum_required(VERSION 3.5)''')],
+            multiLineMatches=True)
+
         extraArgs = [
             '-DBUILD_TESTS=OFF',
             '-DBUILD_FUZZERS=OFF',
