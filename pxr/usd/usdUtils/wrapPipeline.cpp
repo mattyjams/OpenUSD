@@ -59,6 +59,10 @@ void wrapPipeline()
     def("GetPrefName", UsdUtilsGetPrefName,
         return_value_policy<return_by_value>());
     def(
+        "GetGeometryScopeName",
+        UsdUtilsGetGeometryScopeName,
+        arg("forceDefault")=false);
+    def(
         "GetMaterialsScopeName",
         UsdUtilsGetMaterialsScopeName,
         arg("forceDefault")=false);
