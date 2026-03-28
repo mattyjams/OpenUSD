@@ -1591,6 +1591,16 @@ def InstallOpenColorIO(context, force, buildArgs):
     ocioDestFileName = os.path.splitext(os.path.basename(OCIO_URL))[0]
     with CurrentWorkingDirectory(DownloadURL(OCIO_URL, context, force,
                                              destFileName=ocioDestFileName)):
+        # CMake 4.0.0 dropped support for CMake versions earlier than 3.5.
+        # This has not yet been fixed in yaml-cpp which is used by OpenColorIO,
+        # but it can be worked around for now by setting back the CMake policy
+        # version minimum for OpenColorIO's yaml-cpp build.
+        PatchFile(
+            "share/cmake/modules/install/Installyaml-cpp.cmake",
+            [('            -DCMAKE_POLICY_DEFAULT_CMP0063=NEW',
+'''            -DCMAKE_POLICY_DEFAULT_CMP0063=NEW
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5''')])
+
         extraArgs = ['-DOCIO_BUILD_APPS=OFF',
                      '-DOCIO_BUILD_DOCS=OFF',
                      '-DOCIO_BUILD_TESTS=OFF',
