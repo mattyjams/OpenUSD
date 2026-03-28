@@ -2698,7 +2698,7 @@ if context.buildOneTBB or context.targetWasm:
 requiredDependencies = [TBB]
 
 if context.buildAlembic:
-    requiredDependencies += [OPENEXR, ALEMBIC]
+    requiredDependencies += [IMATH, ALEMBIC]
 
 if context.buildDraco:
     requiredDependencies += [DRACO]
