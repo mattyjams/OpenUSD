@@ -111,6 +111,11 @@ def GetBuildTargets():
 def MacOSTargetEmbedded(context):
     return MacOS() and apple_utils.TargetEmbeddedOS(context)
 
+def MacOSTargetUniversal(context):
+    return (
+        MacOS() and
+        apple_utils.GetTargetName(context) == apple_utils.TARGET_UNIVERSAL)
+
 def GetLocale():
     if Windows():
         # Windows handles encoding a little differently then Linux / Mac
