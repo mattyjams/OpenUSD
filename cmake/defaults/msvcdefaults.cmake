@@ -150,3 +150,8 @@ set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4221")
 if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
     set(_PXR_CXX_FLAGS "${_PXR_CXX_FLAGS} /FS")
 endif()
+
+# Ensure Unicode support is available, which is required by fmt 11+, which
+# is used by OpenImageIO. See the commit here:
+# https://github.com/AcademySoftwareFoundation/OpenImageIO/commit/27b6799b52495d7034d1914c53fdb3011f4c7aee
+set(_PXR_CXX_FLAGS "${_PXR_CXX_FLAGS} /utf-8")
