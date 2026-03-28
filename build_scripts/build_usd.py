@@ -1518,7 +1518,7 @@ OPENVDB = Dependency("OpenVDB", InstallOpenVDB, "include/openvdb/openvdb.h")
 ############################################################
 # OpenImageIO
 
-OIIO_URL = "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.1.8.0.zip"
+OIIO_URL = "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v3.1.17.0.zip"
 
 def InstallOpenImageIO(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OIIO_URL, context, force)):
@@ -1549,12 +1549,6 @@ def InstallOpenImageIO(context, force, buildArgs):
         # library outside of our build.
         if not context.enablePtex:
             extraArgs.append('-DUSE_PTEX=OFF')
-
-        # OpenImageIO 2.3.5 changed the default postfix for debug library
-        # names from "" to "_d". USD's build system currently does not support
-        # finding the library under this name, so as an interim workaround
-        # we reset it back to its old value.
-        extraArgs.append('-DCMAKE_DEBUG_POSTFIX=""')
 
         # Homebrew-installed dependencies of OpenImageIO can cause build
         # and link issues when building for USD, so avoid using them.
