@@ -28,6 +28,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 SDF_DECLARE_HANDLES(SdfLayer);
 
 USDUTILS_API
+extern TfEnvSetting<bool> USD_FORCE_DEFAULT_GEOMETRY_SCOPE_NAME;
+
+USDUTILS_API
 extern TfEnvSetting<bool> USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME;
 
 USDUTILS_API
@@ -133,6 +136,23 @@ const TfToken& UsdUtilsGetPrimaryUVSetName();
 /// By default the name is "pref".
 USDUTILS_API
 const TfToken& UsdUtilsGetPrefName();
+
+/// Get the name of the USD prim under which asset geometry is expected to be
+/// authored.
+///
+/// The scope name can be configured in the metadata of a plugInfo.json file
+/// like so:
+/// \code{json}
+///    "UsdUtilsPipeline": {
+///        "GeometryScopeName": "SomeScopeName"
+///    }
+/// \endcode
+///
+/// If \p forceDefault is true, any value specified in a plugInfo.json will be
+/// ignored and the built-in default will be returned. This is primarily used
+/// for unit testing purposes as a way to ignore any site-based configuration.
+USDUTILS_API
+TfToken UsdUtilsGetGeometryScopeName(const bool forceDefault = false);
 
 /// Get the name of the USD prim under which materials are expected to be
 /// authored.
