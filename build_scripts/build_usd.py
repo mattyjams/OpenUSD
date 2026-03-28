@@ -1520,28 +1520,15 @@ BLOSC = Dependency("Blosc", InstallBLOSC, "include/blosc.h")
 ############################################################
 # OpenVDB
 
-OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v10.1.0.zip"
+# Note that OpenVDB 10.X+ requires TBB 2020.2 or later,
+# and OpenVDB 12.X+ requires Boost 1.80 or later.
+OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v13.0.0.zip"
 
 def InstallOpenVDB(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OPENVDB_URL, context, force)):
-        # Back-port patch from OpenVDB PR #1977 to avoid errors when building
-        # with Xcode 16.3+. This fix is anticipated to be part of an OpenVDB
-        # 12.x release, which is in the VFX Reference Platform CY2025 and is
-        # several major versions ahead of what we currently use.
-        PatchFile("openvdb/openvdb/tree/NodeManager.h",
-                  [("OpT::template eval", "OpT::eval")])
-
-        # Replace BOOST_STATIC_ASSERT to workaround an "identifier not found"
-        # build failure on Windows with Visual Studio 2022. This change already
-        # exists upstream in OpenVDB 11.0.0+.
-        PatchFile("openvdb/openvdb/tools/VelocityFields.h",
-                  [("BOOST_STATIC_ASSERT(OrderRK <= 4);",
-                    "static_assert(OrderRK <= 4);")])
-
         extraArgs = [
-            '-DOPENVDB_BUILD_PYTHON_MODULE=OFF',
             '-DOPENVDB_BUILD_BINARIES=OFF',
-            '-DOPENVDB_BUILD_UNITTESTS=OFF'
+            '-DUSE_IMATH_HALF=ON'
         ]
 
         # Make sure to use boost installed by the build script and not any
@@ -1551,9 +1538,6 @@ def InstallOpenVDB(context, force, buildArgs):
         extraArgs.append('-DBLOSC_ROOT="{instDir}"'
                          .format(instDir=context.instDir))
         extraArgs.append('-DTBB_ROOT="{instDir}"'
-                         .format(instDir=context.instDir))
-        # OpenVDB needs Half type from IlmBase
-        extraArgs.append('-DILMBASE_ROOT="{instDir}"'
                          .format(instDir=context.instDir))
 
         # Add on any user-specified extra arguments.
