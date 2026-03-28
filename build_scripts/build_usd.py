@@ -1517,15 +1517,16 @@ BLOSC = Dependency("Blosc", InstallBLOSC, "include/blosc.h")
 ############################################################
 # OpenVDB
 
-OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v12.1.1.zip"
+# Note that OpenVDB 10.X+ requires TBB 2020.2 or later,
+# and OpenVDB 12.X+ requires Boost 1.80 or later.
+OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v13.1.0.zip"
 
 def InstallOpenVDB(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OPENVDB_URL, context, force)):
         extraArgs = [
-            '-DOPENVDB_BUILD_PYTHON_MODULE=OFF',
             '-DOPENVDB_BUILD_BINARIES=OFF',
-            '-DOPENVDB_BUILD_UNITTESTS=OFF',
             '-DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON',
+            '-DUSE_IMATH_HALF=ON'
         ]
 
         # Make sure to use boost installed by the build script and not any
