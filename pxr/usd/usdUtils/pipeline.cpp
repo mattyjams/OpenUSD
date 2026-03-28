@@ -31,6 +31,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 
 TF_DEFINE_ENV_SETTING(
+    USD_FORCE_DEFAULT_GEOMETRY_SCOPE_NAME,
+    false,
+    "Disables the ability to configure the geometry scope name with a "
+    "plugInfo.json value and forces the use of the built-in default instead. "
+    "This is primarily used for unit testing purposes as a way to ignore any "
+    "site-based configuration.");
+
+TF_DEFINE_ENV_SETTING(
     USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME,
     false,
     "Disables the ability to configure the materials scope name with a "
@@ -375,6 +383,20 @@ TF_MAKE_STATIC_DATA(_TokenToTokenMap, _pipelineIdentifiersMap)
     });
 
     *_pipelineIdentifiersMap = _GetPipelineIdentifierTokens(identifierKeys);
+}
+
+TfToken
+UsdUtilsGetGeometryScopeName(const bool forceDefault)
+{
+    if (TfGetEnvSetting(USD_FORCE_DEFAULT_GEOMETRY_SCOPE_NAME) ||
+            forceDefault) {
+        return _tokens->DefaultGeometryScopeName;
+    }
+
+    return TfMapLookupByValue(
+        *_pipelineIdentifiersMap,
+        _tokens->GeometryScopeName,
+        _tokens->DefaultGeometryScopeName);
 }
 
 TfToken
