@@ -1007,15 +1007,10 @@ def InstallBoost_Helper(context, force, buildArgs):
             '--with-regex'
         ]
 
-        if context.buildOIIO:
-            b2_settings.append("--with-date_time")
-
-        if context.buildOIIO or context.enableOpenVDB:
+        if context.enableOpenVDB:
             b2_settings.append("--with-chrono")
             b2_settings.append("--with-system")
             b2_settings.append("--with-thread")
-
-        if context.enableOpenVDB:
             b2_settings.append("--with-iostreams")
 
             # b2 with -sNO_COMPRESSION=1 fails with the following error message:
@@ -1030,9 +1025,6 @@ def InstallBoost_Helper(context, force, buildArgs):
             # exclude the bzip2 compression from boost_iostreams (note that
             # OpenVDB uses blosc compression).
             b2_settings.append("-sNO_BZIP2=1")
-
-        if context.buildOIIO:
-            b2_settings.append("--with-filesystem")
 
         if force:
             b2_settings.append("-a")
@@ -2715,7 +2707,7 @@ if context.buildImaging:
         requiredDependencies += [ZLIB, OPENCOLORIO]
 
     if context.buildOIIO:
-        requiredDependencies += [ZLIB, BOOST, JPEG, TIFF, PNG, IMATH, OPENEXR, OPENIMAGEIO]
+        requiredDependencies += [ZLIB, JPEG, TIFF, PNG, IMATH, OPENEXR, OPENIMAGEIO]
 
     if context.buildEmbree:
         requiredDependencies += [TBB, EMBREE]
