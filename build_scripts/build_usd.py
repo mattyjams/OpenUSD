@@ -1108,7 +1108,7 @@ BOOST = Dependency("boost", InstallBoost, *BOOST_VERSION_FILES)
 ############################################################
 # Intel oneTBB
 
-ONETBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2021.12.0.zip"
+ONETBB_URL = "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2021.12.0.zip"
 
 def InstallOneTBB(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(ONETBB_URL, context, force)):
@@ -1134,13 +1134,10 @@ ONETBB = Dependency("oneTBB", InstallOneTBB, "include/oneapi/tbb.h")
 # Intel TBB
 
 if Windows():
-    TBB_URL = "https://github.com/oneapi-src/oneTBB/releases/download/v2020.3/tbb-2020.3-win.zip"
+    TBB_URL = "https://github.com/uxlfoundation/oneTBB/releases/download/v2020.3/tbb-2020.3-win.zip"
     TBB_ROOT_DIR_NAME = "tbb"
-elif MacOS():
-    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.zip"
 else:
-    # Use point release with fix https://github.com/oneapi-src/oneTBB/pull/833
-    TBB_URL = "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2020.3.1.zip"
+    TBB_URL = "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2020.3.3.zip"
 
 def InstallTBB(context, force, buildArgs):
     if context.targetWasm:
@@ -1315,7 +1312,7 @@ def InstallTBB_Linux(context, force, buildArgs):
         # "debug" and re-run the build, copying the debug libraries
         # afterwards. 
         #
-        # See https://github.com/oneapi-src/oneTBB/issues/207/
+        # See https://github.com/uxlfoundation/oneTBB/issues/207/
         PatchFile("Makefile", [("release", "debug")])
         Run(makeTBBCmd)
 
