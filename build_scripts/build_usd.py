@@ -1401,12 +1401,7 @@ PNG_URL = "https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.58.zip"
 
 def InstallPNG(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(PNG_URL, context, force)):
-        # Framework builds were enabled by default in v1.6.41 in commit
-        # 8fc13a8. We explicitly disable this to maintain legacy behavior
-        # from v1.6.38, which is what this script used previously.
-        # OpenImageIO v2.5.16.0 runs into linker issues otherwise.
-        macArgs = ["-DPNG_FRAMEWORK=OFF"]
-
+        macArgs = []
         if MacOS() and apple_utils.IsTargetArm(context):
             # Ensure libpng's build doesn't erroneously activate inappropriate
             # Neon extensions
