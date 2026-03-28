@@ -794,7 +794,25 @@ def InstallZlib(context, force, buildArgs):
         RunCMake(context, force, extraArgs + buildArgs)
 
 ZLIB = Dependency("zlib", InstallZlib, "include/zlib.h")
-        
+
+############################################################
+# libdeflate
+
+DEFLATE_URL = "https://github.com/ebiggers/libdeflate/archive/refs/tags/v1.26.zip"
+
+def InstallDeflate(context, force, buildArgs):
+    cmakeOptions = [
+        '-DLIBDEFLATE_BUILD_STATIC_LIB=OFF',
+        '-DLIBDEFLATE_BUILD_GZIP=OFF',
+        '-DLIBDEFLATE_BUILD_TESTS=OFF'
+    ]
+    cmakeOptions += buildArgs
+
+    with CurrentWorkingDirectory(DownloadURL(DEFLATE_URL, context, force)):
+        RunCMake(context, force, cmakeOptions)
+
+DEFLATE = Dependency("libdeflate", InstallDeflate, "include/libdeflate.h")
+
 ############################################################
 # boost
 
