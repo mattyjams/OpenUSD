@@ -821,6 +821,51 @@ BOOST_VERSION_FILES = [
 ]
 
 def InstallBoost_Helper(context, force, buildArgs):
+    # Some notes on version inter-dependencies:
+    # - Python 3.10 requires at least Boost 1.76.
+    # - Python 3.11 requires at least Boost 1.81.
+    #   (https://github.com/boostorg/python/commit/a218ba)
+    # - Boost itself did not add support for Visual Studio 2022/msvc 143 until
+    #   version 1.78.
+    # - OpenVDB 12.X+ requires at least Boost 1.80.
+    # - The VFX reference platform for calendar year 2024 specifies Boost
+    #   version 1.82.0.
+    # - CMake supports Boost 1.82 as of version 3.27.0:
+    #   https://github.com/Kitware/CMake/commit/5cbbe55
+    #
+    #   Visual Studio 2022 version 17.8.0 was the first to bundle a 3.27.X
+    #   version of CMake and include a FindBoost module that supports Boost
+    #   1.82. For earlier versions of Visual Studio,
+    #   "Boost_ADDITIONAL_VERSIONS=1.82" may need to be set anywhere other
+    #   Boost flags like "Boost_NO_SYSTEM_PATHS" are being set.
+    # - The VFX reference platform for calendar year 2025 specifies Boost
+    #   version 1.85.0.
+    # - CMake supports Boost 1.85 as of version 3.29.3:
+    #   https://github.com/Kitware/CMake/commit/0d5953b
+    #
+    #   The version of Visual Studio 2022 being used must offer a release
+    #   bundling a 3.29.3 or later version of CMake. For earlier versions of
+    #   Visual Studio 2022 with older CMake versions,
+    #   "Boost_ADDITIONAL_VERSIONS=1.85" may need to be set anywhere other
+    #   Boost flags like "Boost_NO_SYSTEM_PATHS" are being set.
+    # - CMake 3.30.0 introduced a new policy CMP0167 to remove the FindBoost
+    #   module and instead rely on the BoostConfig.cmake provided by Boost:
+    #   https://github.com/Kitware/CMake/commit/e0355c4
+    #
+    #   The commit description suggests that when using a 1.70.0 version or
+    #   later of Boost, using the BoostConfig.cmake provided by Boost should
+    #   be preferred over using the FindBoost module, in which case the
+    #   Boost_NO_BOOST_CMAKE flag should *not* be used.
+    # - CMake supports Boost 1.86 as of version 3.30.6 (when the new
+    #   CMP0167 policy is set to the "OLD" behavior):
+    #   https://github.com/Kitware/CMake/commit/f941fb6c
+    # - NumPy 2.0.0 introduced an API change that required a modification in
+    #   boost::python:
+    #   https://github.com/boostorg/python/commit/0474de0
+    #
+    #   This change was first released as part of Boost 1.87.0.
+
+    # ORIGINAL NOTES:
     # In general we use boost 1.80.0 to adhere to VFX Reference Platform CY2023.
     # However, there are some cases where a newer version is required.
     # - Building with Visual Studio 2022 with the 14.4x toolchain requires boost
