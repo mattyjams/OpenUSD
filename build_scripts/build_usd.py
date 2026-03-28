@@ -2702,7 +2702,7 @@ if context.buildImaging:
         requiredDependencies += [ZLIB, OPENCOLORIO]
 
     if context.buildOIIO:
-        requiredDependencies += [ZLIB, JPEG, TIFF, PNG, IMATH, OPENEXR, OPENIMAGEIO]
+        requiredDependencies += [ZLIB, JPEG, TIFF, PNG, IMATH, OPENEXR, OPENCOLORIO, OPENIMAGEIO]
 
     if context.buildEmbree:
         requiredDependencies += [TBB, EMBREE]
