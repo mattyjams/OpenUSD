@@ -1484,18 +1484,16 @@ PTEX = Dependency("Ptex", InstallPtex, "include/PtexVersion.h")
 ############################################################
 # BLOSC (Compression used by OpenVDB)
 
-BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/v1.20.1.zip"
-if MacOS():
-    # Using blosc v1.21.6 to avoid build errors with Xcode 16.3+ toolchain, 
-    # caused by incompatibility with internally used zlib v1.2.8 with blosc 
-    # v1.20.1
-    BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/v1.21.6.zip"
+BLOSC_URL = "https://github.com/Blosc/c-blosc/archive/refs/tags/v1.21.6.zip"
 
 def InstallBLOSC(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(BLOSC_URL, context, force)):
-        # c-blosc's CMakeLists declares a cmake_minimum_required below 3.5,
-        # which is incompatible with CMake 4.x.
-        extraArgs = ["-DCMAKE_POLICY_VERSION_MINIMUM=3.5"]
+        extraArgs = [
+            '-DBUILD_TESTS=OFF',
+            '-DBUILD_FUZZERS=OFF',
+            '-DBUILD_BENCHMARKS=OFF'
+        ]
+
         # Prefer external zlib.
         extraArgs += ["-DPREFER_EXTERNAL_ZLIB=ON"]
         if MacOS() and apple_utils.IsTargetArm(context):
