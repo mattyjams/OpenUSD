@@ -49,6 +49,7 @@ TF_DEFINE_PRIVATE_TOKENS(
     _tokens,
 
     (UsdUtilsPipeline)
+        (GeometryScopeName)
         (MaterialsScopeName)
         (PrimaryCameraName)
         (ProvidesRegisteredVariantSetsFromPlugin)
@@ -368,6 +369,7 @@ _GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys)
 TF_MAKE_STATIC_DATA(_TokenToTokenMap, _pipelineIdentifiersMap)
 {
     const TfTokenVector identifierKeys({
+        _tokens->GeometryScopeName,
         _tokens->MaterialsScopeName,
         _tokens->PrimaryCameraName
     });
