@@ -2679,15 +2679,15 @@ if context.buildImaging:
     requiredDependencies += [OPENSUBDIV]
 
     if context.enableOpenVDB:
-        requiredDependencies += [ZLIB, TBB, BLOSC, BOOST, OPENVDB]
-    
+        requiredDependencies += [ZLIB, TBB, BLOSC, BOOST, IMATH, OPENVDB]
+
     # When OCIO is required, we need to make sure it's built before OIIO, since
     # OIIO is dependent on OCIO.
     if context.buildOCIO:
         requiredDependencies += [ZLIB, OPENCOLORIO]
 
     if context.buildOIIO:
-        requiredDependencies += [ZLIB, JPEG, TIFF, PNG, OPENEXR, OPENCOLORIO, OPENIMAGEIO]
+        requiredDependencies += [ZLIB, JPEG, TIFF, PNG, IMATH, OPENEXR, OPENCOLORIO, OPENIMAGEIO]
 
     if context.buildEmbree:
         requiredDependencies += [TBB, EMBREE]
