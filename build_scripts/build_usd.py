@@ -1472,7 +1472,11 @@ def InstallPtex(context, force, buildArgs):
     ]
     cmakeOptions += buildArgs
 
-    with CurrentWorkingDirectory(DownloadURL(PTEX_URL, context, force)):
+    # Version number currently matches OpenColorIO.
+    destFileName = 'Ptex_{v}.zip'.format(v=PTEX_VERSION)
+
+    with CurrentWorkingDirectory(
+            DownloadURL(PTEX_URL, context, force, destFileName=destFileName)):
         RunCMake(context, force, cmakeOptions)
 
 PTEX = Dependency("Ptex", InstallPtex, "include/PtexVersion.h")
@@ -1603,10 +1607,12 @@ OPENIMAGEIO = Dependency("OpenImageIO", InstallOpenImageIO,
 # OpenColorIO
 
 OCIO_URL = "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v2.5.2.zip"
+OCIO_VERSION = "v2.5.2"
 
 def InstallOpenColorIO(context, force, buildArgs):
-    # build ocio dest file name based on the OCIO_URL version
-    ocioDestFileName = os.path.splitext(os.path.basename(OCIO_URL))[0]
+    # Version number currently matches Ptex.
+    ocioDestFileName = 'OpenColorIO_{v}.zip'.format(v=OCIO_VERSION)
+
     with CurrentWorkingDirectory(DownloadURL(OCIO_URL, context, force,
                                              destFileName=ocioDestFileName)):
         # CMake 4.0.0 dropped support for CMake versions earlier than 3.5.
