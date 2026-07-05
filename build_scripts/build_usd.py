@@ -1316,7 +1316,7 @@ JPEG = Dependency("JPEG", InstallJPEG, "include/jpeglib.h")
 ############################################################
 # TIFF
 
-TIFF_URL = "https://gitlab.com/libtiff/libtiff/-/archive/v4.7.1/libtiff-v4.7.1.zip"
+TIFF_URL = "https://gitlab.com/libtiff/libtiff/-/archive/v4.7.2/libtiff-v4.7.2.zip"
 
 def InstallTIFF(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(TIFF_URL, context, force)):
