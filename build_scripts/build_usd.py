@@ -1526,6 +1526,32 @@ OPENVDB_URL = "https://github.com/AcademySoftwareFoundation/openvdb/archive/refs
 
 def InstallOpenVDB(context, force, buildArgs):
     with CurrentWorkingDirectory(DownloadURL(OPENVDB_URL, context, force)):
+        # Apply an unreleased fix to allow building against oneTBB 2023+:
+        # https://github.com/AcademySoftwareFoundation/openvdb/pull/2200
+        # https://github.com/AcademySoftwareFoundation/openvdb/commit/d68d0914fc6ed41cadd363bd4330c39a7fb5b1f1
+        PatchFile(
+            "openvdb/openvdb/thread/Threading.h",
+            [(
+'''/// @note tbb/blocked_range.h is the ONLY include that persists from TBB 2020
+///   to TBB 2021 that itself includes the TBB specific version header files.
+///   In TBB 2020, the version header was called tbb/stddef.h. In 2021, it's
+///   called tbb/version.h. We include tbb/blocked_range.h here to indirectly
+///   access the version defines in a consistent way so that downstream
+///   software doesn't need to provide compile time defines.
+#include <tbb/blocked_range.h>
+#include <tbb/task.h>''',
+'''#include <tbb/blocked_range.h>
+#include <tbb/task.h>
+/// @note tbb/task_arena.h is the ONLY include that persists from TBB 2020
+///   to TBB 2021 to TBB 2023 that itself includes the TBB specific version
+///   header files.
+///   In TBB 2020, the version header was called tbb/stddef.h. In 2021+, it's
+///   called tbb/version.h. We include tbb/task_arena.h here to indirectly
+///   access the version defines in a consistent way so that downstream
+///   software doesn't need to provide compile time defines.
+#include <tbb/task_arena.h>''')],
+            multiLineMatches=True)
+
         extraArgs = [
             '-DOPENVDB_BUILD_BINARIES=OFF',
             '-DUSE_IMATH_HALF=ON'
