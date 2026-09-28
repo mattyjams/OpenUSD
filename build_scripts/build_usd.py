@@ -1436,12 +1436,6 @@ def InstallOpenEXR(context, force, buildArgs):
                  ['-DOPENEXR_INSTALL_TOOLS=OFF',
                   '-DOPENEXR_BUILD_TOOLS=OFF',
                   '-DOPENEXR_BUILD_EXAMPLES=OFF',
-
-                  # Force OpenEXR to build and use a separate Imath library
-                  # instead of looking for one externally. This ensures that
-                  # OpenEXR and other dependencies use the Imath library
-                  # built via this script.
-                  '-DOPENEXR_FORCE_INTERNAL_IMATH=ON',
                   '-DBUILD_TESTING=OFF'] + buildArgs)
 
 OPENEXR = Dependency("OpenEXR", InstallOpenEXR, "include/OpenEXR/ImfVersion.h")
