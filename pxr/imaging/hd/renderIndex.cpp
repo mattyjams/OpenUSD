@@ -1169,8 +1169,8 @@ HdRenderIndex::_ConfigureReprs()
     HdImplicitSurface::ConfigureRepr(HdReprTokens->points,
                             HdImplicitSurfaceReprDesc(
                                 HdImplicitSurfaceGeomStylePoints,
-                                HdCullStyleDontCare,
-                                HdImplicitSurfaceReprDescTokens->surfaceShader,
+                                HdCullStyleNothing,
+                                HdImplicitSurfaceReprDescTokens->pointColor,
                                 /*blendWireframeColor=*/false));
 }
 // -------------------------------------------------------------------------- //

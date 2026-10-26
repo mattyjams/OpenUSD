@@ -17,6 +17,7 @@
 #import $TOOLS/hdSt/shaders/terminals.glslfx
 #import $TOOLS/hdSt/shaders/edgeId.glslfx
 #import $TOOLS/hdSt/shaders/pointId.glslfx
+#import $TOOLS/hdSt/shaders/pointDisk.glslfx
 
 #import $TOOLS/hdSt/shaders/capsule.glslfx
 #import $TOOLS/hdSt/shaders/conicalFrustum.glslfx
@@ -768,4 +769,81 @@ void main(void)
         discard;
         return;
     }
+}
+
+--- --------------------------------------------------------------------------
+-- layout ImplicitSurface.Vertex.Points
+
+[
+    ["out block", "VertexData", "outData",
+        ["vec3", "Peye"]
+    ]
+]
+
+--- --------------------------------------------------------------------------
+-- glsl ImplicitSurface.Vertex.Points
+
+// Fwd declare methods defined in pointId.glslfx, that are used below.
+FORWARD_DECL(int GetPointId());
+FORWARD_DECL(float GetPointRasterSize(int));
+FORWARD_DECL(void ProcessPointId(int));
+
+void main(void)
+{
+    ProcessPrimvarsIn();
+    const MAT4 objToEye = GetWorldToViewMatrix() *
+                          ApplyInstanceTransform(HdGet_transform());
+
+    // For native implicit surfaces, we draw a single camera-facing point at
+    // the origin of the object.
+    const vec3 origin = vec3(0.0);
+    outData.Peye = TransformPoint(objToEye, origin);
+
+    int pointId = GetPointId();
+    gl_PointSize = ApplyPointSizeBias(GetPointRasterSize(pointId));
+    ProcessPointId(pointId);
+
+    gl_Position = vec4(GetProjectionMatrix() * vec4(outData.Peye, 1.0));
+    ApplyClipPlanes(vec4(outData.Peye, 1.0));
+}
+
+--- --------------------------------------------------------------------------
+-- layout ImplicitSurface.Fragment.Points
+
+[
+    ["in block", "VertexData", "inData",
+        ["vec3", "Peye"]
+    ]
+]
+
+--- --------------------------------------------------------------------------
+-- glsl ImplicitSurface.Fragment.Points
+
+void main(void)
+{
+    ApplyDiskSampleMask();
+
+    const vec3 Peye = inData.Peye;
+    // camera facing.
+    const vec3 Neye = vec3(0, 0, 1);
+
+    vec4 color = vec4(0.5, 0.5, 0.5, 1);
+#ifdef HD_HAS_displayColor
+    color.rgb = HdGet_displayColor().rgb;
+#endif
+#ifdef HD_HAS_displayOpacity
+    color.a = HdGet_displayOpacity();
+#endif
+
+    const vec4 patchCoord = vec4(0);
+    color = ShadingTerminal(vec4(Peye, 1), Neye, color, patchCoord);
+
+#ifdef HD_MATERIAL_TAG_MASKED
+    if (ShouldDiscardByAlpha(color)) {
+        discard;
+        return;
+    }
+#endif
+
+    RenderOutput(vec4(Peye, 1), Neye, color, patchCoord);
 }

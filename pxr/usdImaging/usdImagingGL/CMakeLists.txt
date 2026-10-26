@@ -822,6 +822,28 @@ pxr_register_test(testUsdImagingGLNativeImplicits_piCapsulesWireOnSurf
         HDST_ENABLE_NATIVE_IMPLICITS=1
 )
 
+pxr_register_test(testUsdImagingGLNativeImplicits_points
+    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdImagingGLBasicDrawing -offscreen -lighting -shading points -stage intersectingImplicits.usda -camera /main_cam -write testUsdImagingGLNativeImplicits_points.png"
+    IMAGE_DIFF_COMPARE
+        testUsdImagingGLNativeImplicits_points.png
+    FAIL_PERCENT 0.01
+    FAIL 0.05
+    TESTENV testenv/testUsdImagingGLNativeImplicits
+    ENV
+        HDST_ENABLE_NATIVE_IMPLICITS=1
+)
+
+pxr_register_test(testUsdImagingGLNativeImplicits_pointsClipped
+    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdImagingGLBasicDrawing -offscreen -lighting -shading points -stage intersectingImplicitsClipped.usda -camera /main_cam -write testUsdImagingGLNativeImplicits_pointsClipped.png"
+    IMAGE_DIFF_COMPARE
+        testUsdImagingGLNativeImplicits_pointsClipped.png
+    FAIL_PERCENT 0.002
+    FAIL 0.05
+    TESTENV testenv/testUsdImagingGLNativeImplicits
+    ENV
+        HDST_ENABLE_NATIVE_IMPLICITS=1
+)
+
 pxr_register_test(testUsdImagingGLNativeImplicits_piSpheres
     COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdImagingGLBasicDrawing -offscreen -lighting -stage piSpheres.usda -camera /main_cam -write testUsdImagingGLNativeImplicits_piSpheres.png"
     IMAGE_DIFF_COMPARE

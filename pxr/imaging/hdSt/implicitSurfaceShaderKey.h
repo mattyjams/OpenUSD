@@ -27,7 +27,10 @@ struct HdSt_ImplicitSurfaceShaderKey : public HdSt_ShaderKey
                                   TfToken const &primType,
                                   const HdImplicitSurfaceGeomStyle geomStyle,
                                   const bool blendWireframeColor,
-                                  const bool forceOpaqueEdges);
+                                  const bool forceOpaqueEdges,
+                                  TfToken const &shadingTerminal,
+                                  const bool pointsShadingEnabled,
+                                  const bool nativeRoundPoints);
     HDST_API
     ~HdSt_ImplicitSurfaceShaderKey() = default;
 
@@ -38,23 +41,26 @@ struct HdSt_ImplicitSurfaceShaderKey : public HdSt_ShaderKey
     uint32_t GetVertexCountFallback() const override { return vertexCount; }
 
     const TfToken GetDepthQualifier() const override {
-        return HgiShaderKeywordTokens->hdDepthGreater;
+        return usesBillboard ? HgiShaderKeywordTokens->hdDepthGreater
+                             : TfToken();
     }
 
-    // We need to manually handle user-defined clip planes in the FS for
-    // native implicits since that's where the actual value of Peye is
-    // calculated.
+    // We need to manually handle user-defined clip planes in the FS if we use
+    // a billboard, since that's where the actual value of Peye is calculated.
     bool UseHardwareClipPlanes() const override {
-        return false;
+        return !usesBillboard;
     }
 
     HdSt_GeometricShader::PrimitiveType GetPrimitiveType() const override {
-        return HdSt_GeometricShader::PrimitiveType::PRIM_MESH_COARSE_TRIANGLES;
+        return usesBillboard
+                ? HdSt_GeometricShader::PrimitiveType::PRIM_MESH_COARSE_TRIANGLES
+                : HdSt_GeometricShader::PrimitiveType::PRIM_POINTS;
     }
 
     const HdCullStyle cullStyle;
     const bool doubleSided;
     const uint32_t vertexCount;
+    const bool usesBillboard;
 
     TfToken const &GetGlslfxFilename() const override { return glslfx; }
     TfToken const *GetVS() const override { return VS.data(); }
