@@ -350,6 +350,20 @@ _RtxPath(std::string path)
     return path.substr(0, pathPrefix.length()) == pathPrefix;
 }
 
+static std::string
+_MakeRtxPath(
+    const std::string &pluginName,
+    const std::string &path,
+    const TfToken &wrapS,
+    const TfToken &wrapT,
+    const TfToken &sourceColorSpace)
+{
+    return TfStringPrintf(
+        "rtxplugin:%s?filename=%s&wrapS=%s&wrapT=%s&sourceColorSpace=%s",
+        pluginName.c_str(), path.c_str(), wrapS.GetText(), wrapT.GetText(),
+        sourceColorSpace.GetText());
+}
+
 // Update texture nodes that use non-native texture formats
 // to read them via a Renderman texture plugin.
 void
@@ -396,18 +410,29 @@ _ProcessUVTextureNode(
             // Check for source colorspace.
 #if PXR_VERSION >= 2602
             // Color Space info will be on the file param data 
-            const HdMaterialNetworkInterface::NodeParamData fileParamData =
+            HdMaterialNetworkInterface::NodeParamData fileParamData =
                 netInterface->GetNodeParameterData(nodeName, _tokens->file);
-            TfToken sourceColorSpace = 
-                !fileParamData.colorSpace.IsEmpty() 
-                    ? fileParamData.colorSpace
-                    : _tokens->colorSpaceAuto;
+
+            // Color space transformation are handled by the Rendering 
+            // ColorSpace SceneIndex use raw here for authored color spaces 
+            // to avoid any additional color space transformations.
+            const TfToken sourceColorSpace =
+                (fileParamData.colorSpace.IsEmpty() || 
+                fileParamData.colorSpace == _tokens->colorSpaceAuto)
+                    ? _tokens->colorSpaceAuto
+                    : _tokens->raw;
+
+            path = _MakeRtxPath(pluginName, path, wrapS, wrapT, sourceColorSpace);
+
+            // Update the file parameter/fileParamData with the rtx path
+            fileParamData.value = VtValue(path);
+            netInterface->SetNodeParameterData(
+                nodeName, _tokens->file, fileParamData);
 #else
             VtValue sourceColorSpaceVal = netInterface->GetNodeParameterValue(
                 nodeName, _tokens->sourceColorSpace);
             // XXX: This is a workaround for Presto. If there's no
-            // colorspace token, check if there's a colorspace
-            // string.
+            // colorspace token, check if there's a colorspace string.
             TfToken sourceColorSpace = 
                 sourceColorSpaceVal.GetWithDefault(TfToken());
             if (sourceColorSpace.IsEmpty()) {
@@ -416,17 +441,13 @@ _ProcessUVTextureNode(
                         _tokens->colorSpaceAuto.GetString());
                 sourceColorSpace = TfToken(sourceColorSpaceStr);
             }
-#endif
-            path =
-                TfStringPrintf("rtxplugin:%s?filename=%s"
-                                "&wrapS=%s&wrapT=%s&"
-                                "sourceColorSpace=%s",
-                                pluginName.c_str(), path.c_str(),
-                                wrapS.GetText(), wrapT.GetText(),
-                                sourceColorSpace.GetText());
 
+            path = _MakeRtxPath(pluginName, path, wrapS, wrapT, sourceColorSpace);
+
+            // Update the file parameter with the new rtx path
             netInterface->SetNodeParameterValue(
                 nodeName, _tokens->file, VtValue(path));
+#endif
 
         } else if (!HdPrman_Utils::IsRtxHioNeeded(path)) {
             // USD Preview Materials use a texture coordinate

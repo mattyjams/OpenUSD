@@ -672,21 +672,18 @@ _FilterMaterial(
                         upstreamNodeName, upstreamOutputName,
                         nodeName, inputName);
 
-                    // Update the asset param data with the raw colorspace.
+                    // Update the color space on the asset param data.
                     // This ensures that no further colorspace transformation
                     // happens.
                     //
                     // XXX Is this correct?  What if there are multiple
                     // downstream nodes connected to this one output?
                     //
-                    // XXX Revisit this to make sure we should put this color
-                    // space vs the rendering color space
-                    //
                     // Create new ParamData in the Rendering Color Space
                     HdMaterialNetworkInterface::NodeParamData newParamData;
                     newParamData.typeName = paramData.typeName;
                     newParamData.value = paramData.value;
-                    newParamData.colorSpace = GfColorSpaceNames->Raw;
+                    newParamData.colorSpace = renderingColorSpace.GetName();
                     material->SetNodeParameterData(
                         upstreamNodeName, paramName, newParamData);
                 }
@@ -729,7 +726,7 @@ _FilterMaterial(
             const GfColorSpace sourceColorSpace =
                 _GetSourceColorSpace(
                     paramName, nodeName, paramData.colorSpace);
-            if (_SkipColorTransform(sourceColorSpace, renderingColorSpace)){
+            if (_SkipColorTransform(sourceColorSpace, renderingColorSpace)) {
                 continue;
             }
 
@@ -1110,7 +1107,7 @@ TF_REGISTRY_FUNCTION(TfType)
 
 TF_REGISTRY_FUNCTION(HdSceneIndexPlugin)
 {
-    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 5;
+    const HdSceneIndexPluginRegistry::InsertionPhase insertionPhase = 101;
 
     for (auto const& pluginDisplayName : HdPrman_GetPluginDisplayNames()) {
         HdSceneIndexPluginRegistry::GetInstance().RegisterSceneIndexForRenderer(
