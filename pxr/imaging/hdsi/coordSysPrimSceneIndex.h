@@ -114,6 +114,14 @@ protected:
     // to add.
     void _AddBindingsForPrim(const SdfPath &primPath,
                              SdfPathSet * addedCoordSysPrims = nullptr);
+    // Compute the coordSys bindings of the prim at primPath from the input
+    // scene. Does not modify any data structures and is thread-safe.
+    _Bindings _ComputeBindingsForPrim(const SdfPath &primPath) const;
+    // Record the given bindings for the prim at primPath. Same as
+    // _AddBindingsForPrim but with the bindings already computed.
+    void _AddBindings(const SdfPath &primPath,
+                      _Bindings &&bindings,
+                      SdfPathSet * addedCoordSysPrims);
     // Remove coordSys bindings. That is, decrease ref-counts and remove entries
     // from below data structures if needed.
     // Optionally, return prims of type coord system that this scene index needs
