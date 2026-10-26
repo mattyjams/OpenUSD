@@ -1968,10 +1968,6 @@ VdfScheduler::_GenerateTasks(
     schedule->_nodesToKeepTasks.resize(
         numScheduledNodes, VdfScheduleTaskInvalid);
 
-    if (_HasBeenInterrupted()) {
-        return;
-    }
-
     // Before proceeding, Wait until all pool chains have been processed.
     dispatcher.Wait();
 
@@ -2039,10 +2035,6 @@ VdfScheduler::_GenerateTasks(
             &schedule->_computeTasks,
             &numInputsTasks));
 
-    if (_HasBeenInterrupted()) {
-        return;
-    }
-
     // Make sure that all tasks and invocations have been created.
     dispatcher.Wait();
 
@@ -2088,10 +2080,6 @@ VdfScheduler::_ScheduleTaskGraph(
                     std::cref(*schedule),
                     &nodeToDependencies));
 
-            if (_HasBeenInterrupted()) {
-                return;
-            }
-            
             // Wait until all tasks have been created, and all dependencies
             // have been gathered.
             dispatcher.Wait();
