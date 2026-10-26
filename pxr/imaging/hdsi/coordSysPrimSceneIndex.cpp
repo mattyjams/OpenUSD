@@ -429,6 +429,11 @@ HdsiCoordSysPrimSceneIndex::_PrimsAdded(
         return;
     }
 
+    // Skip removing coordinate systems that will be re-added.
+    for (SdfPath const& addedPath: addedCoordSysPrims) {
+        removedCoordSysPrims.erase(addedPath);
+    }
+
     _SendPrimsAdded(entries);
 
     if (!addedCoordSysPrims.empty()) {
@@ -466,6 +471,11 @@ HdsiCoordSysPrimSceneIndex::_PrimsDirtied(
     
     if (!isObserved) {
         return;
+    }
+
+    // Skip removing coordinate systems that will be re-added.
+    for (SdfPath const& addedPath: addedCoordSysPrims) {
+        removedCoordSysPrims.erase(addedPath);
     }
 
     _SendPrimsDirtied(entries);
