@@ -279,8 +279,9 @@ pxr_build_test(testUsdImagingPrimvarUtils
 pxr_build_test(testUsdImagingRerootingSceneIndex
     LIBRARIES
         usdImaging
+        usd
+        sdf
         hd
-        vt
     CPPFILES
         testenv/testUsdImagingRerootingSceneIndex.cpp
 )
