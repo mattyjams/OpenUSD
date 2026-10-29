@@ -625,12 +625,15 @@ pxr_register_test(testVdfRequest
     EXPECTED_RETURN_CODE 0
 )
 
-pxr_register_test(testVdfSchedulerInterruptionPerf
+# This performance tests times out in some debug builds.
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+pxr_register_test(testVdfSchedulerInterruption_Perf
     COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testVdfSchedulerInterruption --numNodes 10000"
     EXPECTED_RETURN_CODE 0
 )
+endif()
 
-pxr_register_test(testVdfScheduling_PerfPerf
+pxr_register_test(testVdfScheduling_Perf
     COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testVdfScheduling_Perf"
     EXPECTED_RETURN_CODE 0
 )
