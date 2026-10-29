@@ -133,6 +133,12 @@ private:
 
     bool
     _HasTrackedBackPlates() const;
+    
+    bool
+    _IsTrackedCamera(const SdfPath &primPath) const;
+
+    void
+    _RemoveTrackedCameras(const SdfPath &primPath);
 
     using _BackPlates = std::unordered_set<TfToken,TfToken::HashFunctor>;
     using _CameraToBackPlatesMap = std::map<SdfPath, _BackPlates>;
@@ -140,6 +146,8 @@ private:
     // Maps the camera prim path to all the names of the back plate instances 
     // associated with it. 
     _CameraToBackPlatesMap _cameraToBackPlates;
+    // Track all cameras
+    SdfPathSet _cameraPaths;
 };
  
 PXR_NAMESPACE_CLOSE_SCOPE

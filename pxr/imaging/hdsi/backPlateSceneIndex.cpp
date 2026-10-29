@@ -223,6 +223,21 @@ HdsiBackPlateSceneIndex::_HasTrackedBackPlates() const {
     return !_cameraToBackPlates.empty();
 }
 
+bool
+HdsiBackPlateSceneIndex::_IsTrackedCamera(const SdfPath &primPath) const
+{
+    return _cameraPaths.find(primPath) != _cameraPaths.end();
+}
+
+void
+HdsiBackPlateSceneIndex::_RemoveTrackedCameras(const SdfPath &primPath)
+{
+    auto it = _cameraPaths.lower_bound(primPath);
+    while (it != _cameraPaths.end() && it->HasPrefix(primPath)) {
+        it = _cameraPaths.erase(it);
+    }
+}
+
 HdSceneIndexPrim
 HdsiBackPlateSceneIndex::GetPrim(const SdfPath &primPath) const
 {
@@ -400,9 +415,13 @@ HdsiBackPlateSceneIndex::_PrimsAdded(
         // Check if camera is entry prim to avoid querying GetPrim() on input 
         // scene index.
         if (entry.primType == HdPrimTypeTokens->camera){
+            _cameraPaths.emplace(entry.primPath);
+
             _AddBackPlateChildren(
                 entry.primPath,
                 isObserved ? &addedBackPlatePrims : nullptr);
+        } else {
+            _cameraPaths.erase(entry.primPath);
         }
     }
     if (!isObserved) {
@@ -428,9 +447,10 @@ HdsiBackPlateSceneIndex::_PrimsRemoved(
 {
     TRACE_FUNCTION();
 
-    if (!_cameraToBackPlates.empty()) {
+    if (!_cameraPaths.empty()) {
         for (const HdSceneIndexObserver::RemovedPrimEntry &entry : entries) {
             _RemoveBackPlateChildren(entry.primPath, nullptr);
+            _RemoveTrackedCameras(entry.primPath);
         }
     }
 
@@ -454,19 +474,34 @@ HdsiBackPlateSceneIndex::_PrimsDirtied(
     SdfPathSet addedBackPlatePrims;
     SdfPathSet removedBackPlatePrims;
     for (const HdSceneIndexObserver::DirtiedPrimEntry &entry : entries) {
+        if (!_IsTrackedCamera(entry.primPath)){
+            continue;
+        }
         if (entry.dirtyLocators.Intersects(
                 HdCameraSchema::GetBackPlateLocator())) {
-            _RemoveBackPlateChildren(
-                entry.primPath,
-                isObserved ? &removedBackPlatePrims : nullptr);
-
-            // XXX Below, we're querying the prim to check if it has back
-            // plates. For the universal locator set, we'd end up querying
-            // non-camera prims. Scope this to just cameras by tracking all
-            // camera prims in _PrimsAdded.
-            _AddBackPlateChildren(
-                entry.primPath,
-                isObserved ? &addedBackPlatePrims : nullptr);
+            // Refresh the back plate instances if any back plates have been 
+            // added or removed.
+            HdCameraSchema cameraSchema = HdCameraSchema::GetFromParent(
+                 _GetInputSceneIndex()->GetPrim(entry.primPath).dataSource);
+            if (cameraSchema) {
+                TfTokenVector backPlates = 
+                    cameraSchema.GetBackPlate().GetNames();
+                const auto it = _cameraToBackPlates.find(entry.primPath);
+                bool instancesChanged = (it == _cameraToBackPlates.end());
+                if (!instancesChanged) {
+                    // Compare current set against cached set
+                    _BackPlates newSet(backPlates.begin(), backPlates.end());
+                    instancesChanged = (newSet != it->second);
+                }
+                if (instancesChanged) {
+                    _RemoveBackPlateChildren(
+                        entry.primPath,
+                        isObserved ? &removedBackPlatePrims : nullptr);
+                    _AddBackPlateChildren(
+                        entry.primPath,
+                        isObserved ? &addedBackPlatePrims : nullptr);
+                }
+            }
         }
         if (entry.dirtyLocators.Intersects(
                 HdCameraSchema::GetDefaultLocator()) ||
