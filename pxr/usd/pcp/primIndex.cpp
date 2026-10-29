@@ -62,7 +62,7 @@ TF_DEFINE_ENV_SETTING(
     "This is for testing and debugging only.");
 
 TF_DEFINE_ENV_SETTING(
-    PCP_ELIDE_IMPLIED_NODES_OF_ELIDED_ORIGINS, false,
+    PCP_ELIDE_IMPLIED_NODES_OF_ELIDED_ORIGINS, true,
     "Elide nodes that were implied from a node that relocation processing "
     "has since elided, so that the set of elided nodes is closed under origin. "
     "When off (the legacy behavior) such nodes can still contribute opinions. "
@@ -2873,9 +2873,9 @@ _ElideSubtree(
 // Eliding a node may detach the graph's shared node pool, which would
 // invalidate a subtree iterator, so collect the nodes before eliding them.
 //
-// This does nothing unless PCP_ELIDE_IMPLIED_NODES_OF_ELIDED_ORIGINS is set,
-// since existing assets depend on these opinions.  The PCP_ELIDED_ORIGIN_LEAKS
-// debug code reports them.
+// Setting PCP_ELIDE_IMPLIED_NODES_OF_ELIDED_ORIGINS to false restores the
+// legacy behavior, in which these nodes contribute opinions.  The
+// PCP_ELIDED_ORIGIN_LEAKS debug code reports them.
 static void
 _ElideNodesWithElidedOrigins(
     const Pcp_PrimIndexer& indexer,
