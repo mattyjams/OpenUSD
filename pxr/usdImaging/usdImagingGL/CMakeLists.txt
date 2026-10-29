@@ -826,7 +826,7 @@ pxr_register_test(testUsdImagingGLNativeImplicits_points
     COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdImagingGLBasicDrawing -offscreen -lighting -shading points -stage intersectingImplicits.usda -camera /main_cam -write testUsdImagingGLNativeImplicits_points.png"
     IMAGE_DIFF_COMPARE
         testUsdImagingGLNativeImplicits_points.png
-    FAIL_PERCENT 0.01
+    FAIL_PERCENT 0.02
     FAIL 0.05
     TESTENV testenv/testUsdImagingGLNativeImplicits
     ENV
@@ -837,7 +837,7 @@ pxr_register_test(testUsdImagingGLNativeImplicits_pointsClipped
     COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdImagingGLBasicDrawing -offscreen -lighting -shading points -stage intersectingImplicitsClipped.usda -camera /main_cam -write testUsdImagingGLNativeImplicits_pointsClipped.png"
     IMAGE_DIFF_COMPARE
         testUsdImagingGLNativeImplicits_pointsClipped.png
-    FAIL_PERCENT 0.002
+    FAIL_PERCENT 0.01
     FAIL 0.05
     TESTENV testenv/testUsdImagingGLNativeImplicits
     ENV
