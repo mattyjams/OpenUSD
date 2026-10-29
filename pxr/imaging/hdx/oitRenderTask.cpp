@@ -227,9 +227,6 @@ HdxOitRenderTask::Prepare(HdTaskContext* ctx,
     // Translucent pass state overrides
     _translucentPassState->SetEnableDepthMask(false);
     _translucentPassState->SetColorMasks({HdRenderPassState::ColorMaskNone});
-
-    // Prepare the translucent pass state
-    _translucentPassState->Prepare(renderIndex->GetResourceRegistry());
 }
 
 void
