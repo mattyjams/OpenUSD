@@ -91,7 +91,8 @@ TF_DEFINE_PRIVATE_TOKENS(
     // utils
     ((transformUtils,           "CoordUtils.Transform"))
     ((projectionUtils,          "CoordUtils.Projection"))
-    ((depthUtils,               "CoordUtils.Depth"))
+    ((depthUtilsCommon,         "CoordUtils.Depth.Common"))
+    ((depthUtilsFragment,       "CoordUtils.Depth.Fragment"))
 
     // shape-agnostic wireframe sections
     ((edgeCommonFS,             "ImplicitSurfaceWire.Fragment.EdgeCommon"))
@@ -332,7 +333,7 @@ HdSt_ImplicitSurfaceShaderKey::HdSt_ImplicitSurfaceShaderKey(
            _tokens->transformUtils };
 
     if (usesBillboard) {
-        VS.push_back(_tokens->depthUtils);
+        VS.push_back(_tokens->depthUtilsCommon);
         VS.push_back(_tokens->commonConstants);
 
         for (TfToken const &section : shapeSections.commonExtras) {
@@ -371,7 +372,8 @@ HdSt_ImplicitSurfaceShaderKey::HdSt_ImplicitSurfaceShaderKey(
     if (usesBillboard) {
         FS.push_back(_tokens->transformUtils);
         FS.push_back(_tokens->projectionUtils);
-        FS.push_back(_tokens->depthUtils);
+        FS.push_back(_tokens->depthUtilsCommon);
+        FS.push_back(_tokens->depthUtilsFragment);
     }
 
     FS.push_back(_tokens->instancing);

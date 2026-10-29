@@ -631,14 +631,14 @@ bool ShouldDiscardByClipPlanes(vec3 Peye)
 
 // Returns a matrix whose output xy coordinates, after the perspective divide,
 // are measured in pixels (relative to the viewport center) instead of NDC.
-MAT4 GetShapeToPixelClip(const MAT4 shapeToEye)
+MAT4 GetShapeToPixelClip(const MAT4 projMat, const MAT4 shapeToEye)
 {
     const vec2 pixelsPerNdc = 0.5 * GetViewport().zw;
 
     // Scale the x and y rows.
     const vec4 rowScale = vec4(pixelsPerNdc, 1.0, 1.0);
 
-    MAT4 projPixel = GetProjectionMatrix();
+    MAT4 projPixel = projMat;
     projPixel[0] *= rowScale;
     projPixel[1] *= rowScale;
     projPixel[2] *= rowScale;
@@ -650,13 +650,30 @@ MAT4 GetShapeToPixelClip(const MAT4 shapeToEye)
 // Returns the window-space depth of Peye, offset by the wireframe depth bias
 // and clamped to be no less than gl_FragCoord.z so that the depth_greater
 // qualifier is respected.
-float WindowDepthFromPeye(vec3 Peye)
+float WindowDepthFromPeye(const MAT4 projMat, const vec3 Peye)
 {
-    const float ndcDepth = TransformPoint(GetProjectionMatrix(), Peye).z;
+    const float ndcDepth = TransformPoint(projMat, Peye).z;
     const float windowDepth = NDCToWindowDepth(ndcDepth);
 
     return max(windowDepth + GetEdgeDepthBias(), gl_FragCoord.z);
 }
+
+bool ShouldDiscardByDepthReadback(const MAT4 projMat,
+                                  const vec3 Peye,
+                                  const float opaqueZWindow)
+{
+    const float windowDepth = WindowDepthFromPeye(projMat, Peye);
+    return windowDepth >= opaqueZWindow;
+}
+
+#ifdef HD_MATERIAL_TAG_TRANSLUCENT
+#ifdef HD_HAS_depthReadback
+#define OIT_TRANSLUCENT_PASS
+#else
+// Translucent implicits without depthReadback are in the OIT opaque pass.
+#define OIT_OPAQUE_PASS
+#endif
+#endif
 
 void main(void)
 {
@@ -671,9 +688,16 @@ void main(void)
                                 HdGet_transformInverse()) *
                             GetWorldToViewInverseMatrix();
 
-    const MAT4 shapeToPixelClip = GetShapeToPixelClip(shapeToEye);
+    const MAT4 projMat = GetProjectionMatrix();
+    const MAT4 shapeToPixelClip = GetShapeToPixelClip(projMat, shapeToEye);
 
     const vec3 rayDirEye = ComputeRayDirectionEye(inData.Peye);
+
+#ifdef OIT_TRANSLUCENT_PASS
+    // This section needs to come here to keep texture sampling in uniform
+    // control flow.
+    const float opaqueZWindow = SampleZBuffer(gl_FragCoord.xy);
+#endif
 
     Ray rayShape;
     rayShape.origin = TransformPoint(eyeToShape, inData.Peye);
@@ -718,6 +742,12 @@ void main(void)
             continue;
         }
 
+#ifdef OIT_TRANSLUCENT_PASS
+        if (ShouldDiscardByDepthReadback(projMat, Peye, opaqueZWindow)) {
+            continue;
+        }
+#endif
+
         pointShape.segment = shapeHits.hits[i].segment;
 
         // XXX: We can probably add an optimization to prevent duplicate
@@ -754,15 +784,31 @@ void main(void)
         }
 #endif
 
+#ifdef OIT_TRANSLUCENT_PASS
+        // OIT translucent pass does not handle opaque pixels.
+        if (color.a >= 1.0) {
+            break;
+        }
+#endif
+
+#ifdef OIT_OPAQUE_PASS
+        // OIT opaque pass does not handle translucent pixels.
+        if (color.a < 1.0) {
+            continue;
+        }
+#endif
+
         RenderOutput(vec4(Peye, 1), Neye, color, patchCoord);
 
-        // Set gl_FragDepth at the first hit that gets rendered.
         if (!anyRendered) {
             anyRendered = true;
-            gl_FragDepth = WindowDepthFromPeye(Peye);
+#ifndef OIT_TRANSLUCENT_PASS
+            // If we are not in the OIT translucent pass, set gl_FragDepth at
+            // the first hit that gets rendered.
+            gl_FragDepth = WindowDepthFromPeye(projMat, Peye);
+            break;
+#endif
         }
-
-        break;
     }
 
     if (!anyRendered) {
@@ -770,6 +816,9 @@ void main(void)
         return;
     }
 }
+
+#undef OIT_TRANSLUCENT_PASS
+#undef OIT_OPAQUE_PASS
 
 --- --------------------------------------------------------------------------
 -- layout ImplicitSurface.Vertex.Points

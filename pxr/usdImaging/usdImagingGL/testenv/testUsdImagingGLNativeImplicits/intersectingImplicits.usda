@@ -40,8 +40,11 @@ def Xform "world"
             "xformOp:scale"
         ]
 
-        def Sphere "sphere1"
+        def Sphere "sphere1" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
         {
+            rel material:binding = </world/Materials/TranslucentBlue>
             color3f[] primvars:displayColor = [(0, 0.3, 0.6)]
 
             double radius = 2.5
@@ -164,8 +167,11 @@ def Xform "world"
             "xformOp:scale"
         ]
 
-        def Cone "cyl3"
+        def Cone "cyl3" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
         {
+            rel material:binding = </world/Materials/TranslucentPurple>
             uniform token axis = "Y"
             double height = 2.5
             double radius = 1.0
@@ -215,8 +221,11 @@ def Xform "world"
             "xformOp:scale"
         ]
 
-        def Capsule "capsule2"
+        def Capsule "capsule2" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
         {
+            rel material:binding = </world/Materials/TranslucentPink>
             uniform token axis = "X"
             double height = 12.0
             double radius = 2.5
@@ -282,5 +291,47 @@ def Xform "world"
             "xformOp:translate",
             "xformOp:rotateXYZ"
         ]
+    }
+
+    def Scope "Materials"
+    {
+        def Material "TranslucentBlue"
+        {
+            token outputs:surface.connect = </world/Materials/TranslucentBlue/Surface.outputs:surface>
+
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0, 0.3, 0.6)
+                float inputs:opacity = 0.4
+                token outputs:surface
+            }
+        }
+
+        def Material "TranslucentPurple"
+        {
+            token outputs:surface.connect = </world/Materials/TranslucentPurple/Surface.outputs:surface>
+
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.6, 0.2, 0.8)
+                float inputs:opacity = 0.5
+                token outputs:surface
+            }
+        }
+
+        def Material "TranslucentPink"
+        {
+            token outputs:surface.connect = </world/Materials/TranslucentPink/Surface.outputs:surface>
+
+            def Shader "Surface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.9, 0.3, 0.5)
+                float inputs:opacity = 0.4
+                token outputs:surface
+            }
+        }
     }
 }

@@ -69,6 +69,9 @@ private:
     // Prepare() does a bunch of analysis to figure out whether the OIT
     // task should run this frame.
     bool _oitShouldDraw;
+
+    // Indicates if the shader will write to the depth buffer.
+    bool _translucentPassHasCustomDepth;
 };
 
 

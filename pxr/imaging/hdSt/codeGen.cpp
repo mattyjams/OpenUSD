@@ -2174,7 +2174,8 @@ HdSt_CodeGen::Compile(HdStResourceRegistry*const registry)
     if (_materialTag == HdStMaterialTagTokens->masked) {
         _genFS << "#define HD_MATERIAL_TAG_MASKED 1\n";
     }
-    if (_materialTag == HdStMaterialTagTokens->translucent) {
+    if (_materialTag == HdStMaterialTagTokens->translucent ||
+        _materialTag == HdStMaterialTagTokens->translucentWithCustomDepth) {
         _genFS << "#define HD_MATERIAL_TAG_TRANSLUCENT 1\n";
     }
     if (doublePrecisionEnabled) {

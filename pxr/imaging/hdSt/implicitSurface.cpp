@@ -404,6 +404,10 @@ HdStImplicitSurface::_UpdateMaterialTagsForAllReprs(
                 continue;
             }
 
+            // The points representation does not write custom depth.
+            const bool hasCustomDepth =
+                desc.geomStyle != HdImplicitSurfaceGeomStylePoints;
+
             HdStDrawItem *drawItem = static_cast<HdStDrawItem*>(
                 repr->GetDrawItem(drawItemIndex++));
 
@@ -411,7 +415,8 @@ HdStImplicitSurface::_UpdateMaterialTagsForAllReprs(
                 GetMaterialId(),
                 _displayOpacityFromPrimvars || _displayOpacityFromInstancer,
                 _displayInOverlay,
-                _occludedSelectionShowsThrough);
+                _occludedSelectionShowsThrough,
+                hasCustomDepth);
         }
     }
 }

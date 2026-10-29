@@ -18,6 +18,7 @@
 
 #include "pxr/imaging/hdSt/renderPass.h"
 #include "pxr/imaging/hdSt/renderPassShader.h"
+#include "pxr/imaging/hdSt/tokens.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -47,6 +48,7 @@ HdxOitRenderTask::HdxOitRenderTask(HdSceneDelegate* delegate, SdfPath const& id)
         std::make_shared<HdStRenderPassState>(_translucentPassShader))
     , _isOitEnabled(HdxOitBufferAccessor::IsOitEnabled())
     , _oitShouldDraw(false)
+    , _translucentPassHasCustomDepth(false)
 {
 }
 
@@ -78,6 +80,9 @@ HdxOitRenderTask::_Sync(
         if (*dirtyBits & HdChangeTracker::DirtyCollection) {
             const auto& coll = delegate->Get(GetId(), HdTokens->collection)
                 .GetWithDefault<HdRprimCollection>();
+            _translucentPassHasCustomDepth = !coll.GetName().IsEmpty() &&
+                coll.GetMaterialTag() ==
+                    HdStMaterialTagTokens->translucentWithCustomDepth;
             if (coll.GetName().IsEmpty() && _translucentPass) {
                 // destroy the translucent pass
                 _translucentPass.reset();
@@ -100,6 +105,17 @@ HdxOitRenderTask::_Sync(
             _translucentPass->Sync();
         }
     }
+}
+
+static
+bool
+_NeedsManualDepthTest(const bool hasCustomDepth,
+                      const HgiCapabilities* capabilities)
+{
+    // Manual depth testing is needed if we are on a device that cannot force
+    // early fragment tests, or if the translucent pass writes custom depth.
+    return hasCustomDepth ||
+            !capabilities->IsSet(HgiDeviceCapabilitiesForceEarlyFragmentTest);
 }
 
 static
@@ -180,10 +196,10 @@ HdxOitRenderTask::Prepare(HdTaskContext* ctx,
     stTranslucentPassState->SetRenderPassShader(_translucentPassShader);
 
     const HgiCapabilities* capabilities = _GetHgi()->GetCapabilities();
-    if (!capabilities->IsSet(HgiDeviceCapabilitiesForceEarlyFragmentTest)) {
-        // In case we don't have support for early fragment test, we need
-        // to skip the depth texture for the translucent pass to avoid reading
-        // and writing to the same depth texture.
+    if (_NeedsManualDepthTest(_translucentPassHasCustomDepth, capabilities)) {
+        // If the translucent pass needs a manual depth test, we need to skip
+        // the depth texture for the translucent pass to avoid reading and
+        // writing to the same depth texture.
         aovBindings.erase(std::remove_if(
             aovBindings.begin(), aovBindings.end(),
             [](const HdRenderPassAovBinding &aov) {
@@ -255,7 +271,26 @@ HdxOitRenderTask::Execute(HdTaskContext* ctx)
     // Fill OIT SSBO buffers for the translucent fragments.
     //
 
+    // If the translucent pass needs a manual depth test, transition the
+    // depth texture (if it exists) to shader read layout.
+    HgiTextureUsage oldLayout {};
+    HgiTextureHandle depthTexture;
+
+    const HgiCapabilities* capabilities = _GetHgi()->GetCapabilities();
+    if (_NeedsManualDepthTest(_translucentPassHasCustomDepth, capabilities)) {
+        if (_HasTaskContextData(ctx, HdAovTokens->depth)) {
+            _GetTaskContextData(ctx, HdAovTokens->depth, &depthTexture);
+            oldLayout =
+                depthTexture->SubmitLayoutChange(HgiTextureUsageBitsShaderRead);
+        }
+    }
+
     _translucentPass->Execute(_translucentPassState, GetRenderTags());
+
+    // Restore old layout.
+    if (oldLayout) {
+        depthTexture->SubmitLayoutChange(oldLayout);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

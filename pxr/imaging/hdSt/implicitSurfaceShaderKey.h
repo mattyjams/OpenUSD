@@ -69,7 +69,7 @@ struct HdSt_ImplicitSurfaceShaderKey : public HdSt_ShaderKey
 
     TfToken glslfx;
     TfSmallVector<TfToken, 15> VS;
-    TfSmallVector<TfToken, 28> FS;
+    TfSmallVector<TfToken, 29> FS;
 };
 
 
